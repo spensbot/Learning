@@ -152,6 +152,8 @@ public:
     std::unordered_set<Edge*> traveled;
     // Create a stack of nodes to visit. Each item also contains a vector of edges which led to that node
     std::vector<std::pair<Node*, std::vector<Edge*>>> toVisit;
+    
+    std::cout << "Searching for Connections between " << startName << " and " << endName << "..." << std::endl;
 
     // Get pointers to the start and end nodes
     auto startNode = getNode(startName);
@@ -192,6 +194,9 @@ public:
           }
         }
       }
+    }
+    if (!isConnected){
+      std::cout << "There are none :/"<< std::endl;
     }
     return isConnected;
   }
@@ -243,6 +248,8 @@ public:
     // Create a fifo queue of nodes to visit. Each item also contains a vector of edges which led to that node
     std::deque<std::pair<Node*, std::vector<Edge*>>> toVisit;
 
+    std::cout << "Searching for Connections between " << startName << " and " << endName << "..." << std::endl;
+
     // Get pointers to the start and end nodes
     auto startNode = getNode(startName);
     auto endNode = getNode(endName);
@@ -283,6 +290,9 @@ public:
         }
       }
     }
+    if (!isConnected){
+      std::cout << "There are none :/" << std::endl;
+    }
     return isConnected;
   }
 
@@ -296,15 +306,24 @@ int main(){
   Graph flights;
   flights.populate();
 
-  // std::cout << flights.depthFirstSearch2("Portland", "Seattle") << std::endl;
-  // std::cout << flights.depthFirstSearch2("Portland", "Barcelona") << std::endl;
-  // std::cout << flights.depthFirstSearch2("Portland", "Iceland") << std::endl;
-  // std::cout << flights.depthFirstSearch2("London", "Portland") << std::endl;
+  std::cout << std::endl << "---------------------------------------------------------------------------------------" << std::endl;
+  std::cout << "Depth-First-Search. Unlimited Node Visits. Limited Connection Uses." << std::endl;
+  std::cout << "---------------------------------------------------------------------------------------" << std::endl << std::endl; 
+  flights.depthFirstSearch2("Portland", "New York City");
+  std::cout << std::endl; 
+  flights.depthFirstSearch2("Los Angeles", "London");
+  std::cout << std::endl; 
+  flights.depthFirstSearch2("Portland", "Iceland");
 
-  std::cout << flights.breadthFirstSearch2("Portland", "Seattle") << std::endl;
-  std::cout << flights.breadthFirstSearch2("Portland", "Barcelona") << std::endl;
-  std::cout << flights.breadthFirstSearch2("Portland", "Iceland") << std::endl;
-  std::cout << flights.breadthFirstSearch2("London", "Portland") << std::endl;
+  std::cout << std::endl << "---------------------------------------------------------------------------------------" << std::endl;
+  std::cout << "Breadth-First-Search. Unlimited Node Visits. Limited Connection Uses." << std::endl;
+  std::cout << "---------------------------------------------------------------------------------------" << std::endl << std::endl; 
+  flights.breadthFirstSearch2("Portland", "New York City");
+  std::cout << std::endl; 
+  flights.breadthFirstSearch2("Los Angeles", "London");
+  std::cout << std::endl; 
+  flights.breadthFirstSearch2("Portland", "Iceland");
+  std::cout << std::endl; 
 
   return 1;
 }

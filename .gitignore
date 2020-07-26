@@ -1,0 +1,8 @@
+a.out
+*.dSYM
+.vscode
+words.txt
+_questions
+binaryTrees
+parenthesis
+
