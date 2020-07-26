@@ -6,10 +6,10 @@
 #include <string>
 #include "timer.h"
 
-std::unique_ptr<int[]> getRandomList(int length){
+std::unique_ptr<int[]> getRandomList(int length, int max){
   int* list = new int[length];
   for(int i=0 ; i<length ; i++){
-    list[i] = rand()%10000;
+    list[i] = rand() % max;
   }
   return std::unique_ptr<int[]>(list);
 }
@@ -201,52 +201,56 @@ bool binarySearch(std::unique_ptr<int[]>& list, Bounds bounds, int val){
 
 int main(){
   int length = 10;
-  int testLength = 1000000;
+  int testLength = 10000;
   Bounds bounds = {0, length-1};
   Bounds testBounds = {0, testLength-1};
-  auto list = getRandomList(length);
+  auto list = getRandomList(length, length);
   auto list2 = copyList(list, length);
   auto list3 = copyList(list, length);
   auto list4 = copyList(list, length);
   
   // printList(list, bounds);
 
-  Timer::testCount = 1000;
+  std::cout << "All tests performed on unsorted lists of " << testLength << " random numbers" << std::endl;
 
-  // std::cout << std::endl << "Bubble Sort: " << std::endl;
+  Timer::testCount = 10;
+
+  std::cout << std::endl << "Bubble Sort: " << std::endl;
   // bubbleSort(list, bounds);
   // printList(list, bounds);
-  // Timer::test([=](){
-  //   auto testList = getRandomList(testLength);
-  //   bubbleSort(testList, testBounds);
-  // });
+  Timer::test([=](){
+    auto testList = getRandomList(testLength, testLength);
+    bubbleSort(testList, testBounds);
+  });
 
-  // std::cout << std::endl << "Selection Sort: " << std::endl;
+  std::cout << std::endl << "Selection Sort: " << std::endl;
   // selectionSort(list4, bounds);
   // printList(list4, bounds);
-  // Timer::test([=](){
-  //   auto testList = getRandomList(testLength);
-  //   selectionSort(testList, testBounds);
-  // });
+  Timer::test([=](){
+    auto testList = getRandomList(testLength, testLength);
+    selectionSort(testList, testBounds);
+  });
 
-  // std::cout << std::endl << "Merge Sort:" << std::endl;
+  std::cout << std::endl << "Merge Sort:" << std::endl;
   // mergeSort(list3, bounds);
   // printList(list3, bounds);
-  // Timer::test([=](){
-  //   auto testList = getRandomList(testLength);
-  //   mergeSort(testList, testBounds);
-  // });  
+  Timer::test([=](){
+    auto testList = getRandomList(testLength, testLength);
+    mergeSort(testList, testBounds);
+  });  
 
-  // std::cout << std::endl << "Quick Sort:" << std::endl;
+  std::cout << std::endl << "Quick Sort:" << std::endl;
   // quickSort(list2, bounds);
   // printList(list2, bounds);
-  // Timer::test([=](){
-  //   auto testList = getRandomList(testLength);
-  //   quickSort(testList, testBounds);
-  // });
+  Timer::test([=](){
+    auto testList = getRandomList(testLength, testLength);
+    quickSort(testList, testBounds);
+  });
+
+  Timer::testCount = 1000;
   
   std::cout << std::endl << "Inefficient Search:" << std::endl;
-  auto testList = getRandomList(testLength);
+  auto testList = getRandomList(testLength, testLength);
   int success = 0;
   Timer::test([&](){
     int testVal = rand()%10000;
@@ -254,10 +258,10 @@ int main(){
       success++;
     }
   });
-  std::cout << (float)success / (float)Timer::testCount << std::endl;
+  std::cout << "Success Ratio: " << (float)success / (float)Timer::testCount << std::endl;
 
   success = 0;
-  std::cout << std::endl << "Binary Search:" << std::endl;
+  std::cout << std::endl << "Binary Search: (Uses a sorted list)" << std::endl;
   quickSort(testList, testBounds);
   Timer::test([&](){
     int testVal = rand()%10000;
@@ -265,7 +269,7 @@ int main(){
       success++;
     }
   });
-  std::cout << (float)success / (float)Timer::testCount << std::endl;
+  std::cout << "Success Ratio: " << (float)success / (float)Timer::testCount << std::endl;
 
   return 1;
 }
