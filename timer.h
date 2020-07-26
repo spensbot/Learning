@@ -45,7 +45,7 @@ public:
     if (testCount > 1){
       std::cout << "Testing " << testCount << " times" << std::endl;
     }
-    std::cout << "Total test duration: " << duration << "us | " << duration/1000.0 << "ms" << std::endl;
+    std::cout << "Total Duration: " << duration << "us | " << duration/1000.0 << "ms" << std::endl;
     if (testCount > 1){
       std::cout << "Average duration per call: " << duration/testCount << "us | " << duration/testCount/1000.0 << "ms" << std::endl;
     }

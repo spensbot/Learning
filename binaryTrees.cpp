@@ -186,7 +186,7 @@ public:
       int length = end - start + 1;
       int centerIndex = start + length / 2;
       add(sortedList[centerIndex]);
-      //Then recursively 
+      //Then recursively add the sub-lists to the left and right of the center element
       add(sortedList, start, centerIndex - 1);
       add(sortedList, centerIndex + 1, end);
     }
@@ -254,17 +254,17 @@ int main(){
 
 // STRESS TESTING
   BinaryTree<int> testTree;
-  max = 1000000;
+  max = 10000000;
   
-  cout << "Creating binary tree with 1 million random numbers" << endl;
+  cout << endl << "Creating binary tree with " << max << " random numbers" << endl;
   Timer::testCount = 1;
   Timer::test([&testTree, max](){
     testTree.populateRandom(max, max);
   });
+  testTree.printInfo();
 
   cout << endl;
-  testTree.printInfo();
-  cout << "Searching for a random number 1million times" << endl;
+  cout << "Searching for a random number" << endl;
   Timer::testCount = 1000000;
   int findSum = 0;
   Timer::test([&findSum, &testTree, max](){
@@ -272,14 +272,14 @@ int main(){
   });
   cout << "Average find: " << (float)findSum / (float)Timer::testCount << endl;
 
-  cout << endl << endl << "Rebasing..." << endl;
+  cout << endl << "Rebasing..." << endl;
   Timer::testCount = 1;
   Timer::test([&testTree](){
     testTree.rebase();
   });
   testTree.printInfo();
 
-  cout << "Searching for a random number 1million times" << endl;
+  cout << endl << "Searching for a random number" << endl;
   findSum = 0;
   Timer::testCount = 1000000;
   Timer::test([&findSum, &testTree, max](){
