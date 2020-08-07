@@ -15,9 +15,15 @@ public:
     delete[] array;
   }
 
-  void push(T newItem){
-    ensureCapacity(size + 1);
+  void push(const T& newItem){
+    reserve(size + 1);
     array[size] = newItem;
+    size++;
+  }
+
+  void push(T&& newItem){
+    reserve(size + 1);
+    array[size] = std::move(newItem);
     size++;
   }
 
@@ -31,8 +37,14 @@ public:
     return array[index];
   }
 
-  void reserve(size_t neededSize){
-    ensureCapacity(neededSize);
+  const T& operator[] (int index) const {
+    return array[index];
+  }
+
+  void reserve(size_t newCapacity){
+    if ( capacity < newCapacity ) {
+      reAllocate(newCapacity);
+    }
   }
 
   size_t getSize(){return size;}
@@ -40,21 +52,22 @@ public:
 private:
   T* array = nullptr;
   size_t size = 0;
-  size_t allocated = 0;
+  size_t capacity = 0;
 
-  void ensureCapacity(size_t neededSize){
-    if ( ! (allocated >= neededSize)) {
-      auto oldArray = array;
-      array = new T[neededSize];
+  void reAllocate(size_t newCapacity){
+    std::cout << std::endl << "Reallocating for size: " << newCapacity << std::endl;
 
-      memcpy(array, oldArray, sizeof(T) * size);
+    auto oldArray = array;
+    array = new T[newCapacity];
 
-      delete[] oldArray;
-
-      allocated = neededSize;
-
-      std::cout << "Reallocating for size: " << allocated << std::endl;
+    for (int i=0 ; i<size ; i++){
+      array[i] = std::move(oldArray[i]);
+      oldArray[i].~T();
     }
+
+    delete[] oldArray;
+
+    capacity = newCapacity;
   }
 };
 
