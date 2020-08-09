@@ -12,9 +12,31 @@ In the terminal:
 - General exercises for solidifying my knowledge of various aspects of a given language
 
 ## My Favorite Examples
+- lifeCycle.cpp
 - binaryTrees.cpp
 - graph.cpp
 - sort2.cpp
+
+### Example output from compiling/running lifeCycle.cpp
+      Constructed 1 (Foo)
+      Constructed 2 based on 1 (Copy: Foo)
+      Constructed 3 based on 2 (Move: Foo)
+      Constructed 4 (Bar)
+      Assigned 1 = 4 (Copy: Bar)
+      Assigned 2 = 4 (Move: Bar)
+
+    Constructions: 4
+      2 default
+      1 copy
+      1 move
+    Assigns: 2
+      1 copy
+      1 move
+
+      Destroyed 4 (* moved *)
+      Destroyed 3 (Foo)
+      Destroyed 2 (Bar)
+      Destroyed 1 (Bar)
 
 ### Example output from compiling/running binaryTrees.cpp
     Creating binary tree with 10000000 random numbers
