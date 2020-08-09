@@ -8,6 +8,20 @@ namespace stm {
 class LifeCycleLogger {
 public:
   // Default constructor
+  // LifeCycleLogger() {
+  //   defaultConstructCount++;
+  //   setId();
+
+  //   const char* _tag = "default";
+
+  //   tagSize = strlen(_tag);
+  //   tag = new char[tagSize + 1];
+  //   memcpy(tag, _tag, tagSize);
+  //   tag[tagSize] = '\0';
+
+  //   log("Constructed");
+  // }
+
   LifeCycleLogger(const char* _tag) {
     defaultConstructCount++;
     setId();
@@ -23,10 +37,12 @@ public:
   ~LifeCycleLogger() {
     log("Destroyed");
     delete[] tag;
+    if (++destroyCount == constructCount()) 
+      std::cout << "All Destroyed" << std::endl;
   }
 
   // Copy constructor
-  LifeCycleLogger(LifeCycleLogger& other) {
+  LifeCycleLogger(const LifeCycleLogger& other) {
     copyConstructCount++;
     setId();
     copyTag(other);
@@ -43,6 +59,7 @@ public:
 
   // Copy Assignment Operator
   LifeCycleLogger& operator=(const LifeCycleLogger& other) {
+    // id = other.id;
     copyAssignCount++;
     copyTag(other);
     logAssign(other.id);
@@ -51,6 +68,7 @@ public:
 
   // Move Assignment Operator
   LifeCycleLogger& operator=(LifeCycleLogger&& other) {
+    // id = other.id;
     moveAssignCount++;
     moveTag(std::move(other));
     logAssign(other.id, true);
@@ -66,7 +84,6 @@ public:
     printCount(defaultConstructCount, "default");
     printCount(copyConstructCount, "copy");
     printCount(moveConstructCount, "move");
-
     std::cout << "Assigns: " << assignCount() << std::endl;
     printCount(copyAssignCount, "copy");
     printCount(moveAssignCount, "move");
@@ -98,6 +115,7 @@ private:
   inline static int moveConstructCount = 0;
   inline static int copyAssignCount = 0;
   inline static int moveAssignCount = 0;
+  inline static int destroyCount = 0;
 
   int id;
 
@@ -146,7 +164,7 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& os, const LifeCycleLogger& lcl) {
-  os << lcl.id << ": " << lcl.tag;
+  os << lcl.id << " (" << (lcl.tag == nullptr ? "* moved *" : lcl.tag) << ")";
   return os;
 }
 

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <vector>
 #include "Vector.h"
 #include "LifeCycleLogger.h"
 
@@ -12,34 +13,33 @@ void printAll(stm::Vector<T>& vect) {
   std::cout << "-----" << std::endl;
 }
 
+template <typename T>
+void printAll(std::vector<T>& vect) {
+  std::cout << "-----" << std::endl;
+  for (auto i=0 ; i<vect.size() ; i++){
+    std::cout << vect[i] << std::endl;
+  }
+  std::cout << "-----" << std::endl;
+}
+
 int main() {
-  // stm::Vector<int> test;
 
-  // test.reserve(3);
-
-  // test.push(1);
-  // test.push(2);
-  // test.push(100);
-  // test.push(43);
-  // test.push(-12);
-
-  // std::cout << test.pop() << std::endl;
-  // std::cout << test.pop() << std::endl;
-
-  // print(test);
+  stm::LifeCycleLogger::shouldLog = true;
 
   stm::Vector<stm::LifeCycleLogger> loggers;
+  // std::vector<stm::LifeCycleLogger> loggers;
 
-  auto logger1 = stm::LifeCycleLogger();
-  stm::LifeCycleLogger logger2;
-  logger2 = stm::LifeCycleLogger();
-  auto loggerTemp = stm::LifeCycleLogger();
-  auto logger3 = std::move(loggerTemp);
+  loggers.reserve(4);
 
-  loggers.push(logger1);
-  loggers.push(logger2);
-  loggers.push(logger3);
-  loggers.push(stm::LifeCycleLogger());
+  loggers.push_back(stm::LifeCycleLogger("Spenser"));
+  loggers.push_back(stm::LifeCycleLogger("asdf"));
+  loggers.push_back(stm::LifeCycleLogger("Jacob"));
+  loggers.push_back(stm::LifeCycleLogger("Juan"));
+
+  // loggers.emplace_back("Spenser");
+  // loggers.emplace_back("asdf");
+  // loggers.emplace_back("Jacob");
+  // loggers.emplace_back("Juan");
 
   printAll(loggers);
 
