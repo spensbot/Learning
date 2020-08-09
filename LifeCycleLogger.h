@@ -8,100 +8,145 @@ namespace stm {
 class LifeCycleLogger {
 public:
   // Default constructor
-  LifeCycleLogger() {
-    m_id = ++numConstructions;
-    
-    heapTest = new char[n];
-    for (int i=0 ; i<n-1 ; i++) {
-      heapTest[i] = rand()%26 + 97;
-    }
-    heapTest[n-1] = '\0';
+  LifeCycleLogger(const char* _tag) {
+    defaultConstructCount++;
+    setId();
+
+    tagSize = strlen(_tag);
+    tag = new char[tagSize + 1];
+    memcpy(tag, _tag, tagSize);
+    tag[tagSize] = '\0';
+
     log("Constructed");
   }
 
   ~LifeCycleLogger() {
-    delete[] heapTest;
     log("Destroyed");
+    delete[] tag;
   }
 
   // Copy constructor
   LifeCycleLogger(LifeCycleLogger& other) {
-    numCopies++;
-    m_id = ++numConstructions;
-
-    heapTest = new char[n];
-    memcpy(heapTest, other.heapTest, n);
-    
-    if (shouldLog) {
-      std::cout << "Copy Constructed " << this->m_id << " from " << other.m_id << std::endl;
-    }
+    copyConstructCount++;
+    setId();
+    copyTag(other);
+    logConstruct(other.id);
   }
 
   // Move constructor
   LifeCycleLogger(LifeCycleLogger&& other) {
-    numMoves++;
-    m_id = ++numConstructions;
-
-    heapTest = other.heapTest;
-    other.heapTest = nullptr;
-
-    if (shouldLog) {
-      std::cout << "Move Constructed " << this->m_id << " from " << other.m_id << std::endl;
-    }
+    moveConstructCount++;
+    setId();
+    moveTag(std::move(other));
+    logConstruct(other.id, true);
   }
 
   // Copy Assignment Operator
   LifeCycleLogger& operator=(const LifeCycleLogger& other) {
-    ++numCopies;
-    m_id = ++numConstructions;
-    heapTest = new char[n];
-    memcpy(heapTest, other.heapTest, n);
-
-    if (shouldLog) {
-      std::cout << "Copy Assigned " << this->m_id << " to " << other.m_id << std::endl;
-    }
+    copyAssignCount++;
+    copyTag(other);
+    logAssign(other.id);
     return *this;
   }
 
   // Move Assignment Operator
   LifeCycleLogger& operator=(LifeCycleLogger&& other) {
-    ++numMoves;
-    m_id = ++numConstructions;
-    heapTest = other.heapTest;
-    other.heapTest=nullptr;
-
-    if (shouldLog) {
-      std::cout << "Move Assigned " << this->m_id << " to " << other.m_id << std::endl;
-    }
+    moveAssignCount++;
+    moveTag(std::move(other));
+    logAssign(other.id, true);
     return *this;
   }
 
+  void print() {
+    std::cout << tag << std::endl;
+  }
+
   static void printInfo(){
-    std::cout << "Copies: " << numCopies << " Moves: " << numMoves << std::endl;
+    std::cout << "Constructions: " << constructCount() << std::endl;
+    printCount(defaultConstructCount, "default");
+    printCount(copyConstructCount, "copy");
+    printCount(moveConstructCount, "move");
+
+    std::cout << "Assigns: " << assignCount() << std::endl;
+    printCount(copyAssignCount, "copy");
+    printCount(moveAssignCount, "move");
+  }
+
+  static int constructCount() {
+    return defaultConstructCount + copyConstructCount + moveConstructCount;
+  }
+
+  static int assignCount() {
+    return copyAssignCount + moveAssignCount;
+  }
+
+  static int moveCount() {
+    return moveConstructCount + moveAssignCount;
+  }
+
+  static int copyCount() {
+    return copyConstructCount + copyAssignCount;
   }
 
   friend std::ostream& operator<<(std::ostream&, const LifeCycleLogger&);
 
-  inline static bool shouldLog = true;
+  inline static bool shouldLog = false;
 
 private:
-  inline static int numConstructions = 0;
-  inline static int numCopies = 0;
-  inline static int numMoves = 0;
-  int m_id;
+  inline static int defaultConstructCount = 0;
+  inline static int copyConstructCount = 0;
+  inline static int moveConstructCount = 0;
+  inline static int copyAssignCount = 0;
+  inline static int moveAssignCount = 0;
 
-  char* heapTest = nullptr;
-  const int n = 10;
+  int id;
+
+  char* tag = nullptr;
+  int tagSize = 0;
+
+  void setId() {
+    id = constructCount();
+  }
+
+  void copyTag(const LifeCycleLogger& other) {
+    tagSize = other.tagSize;
+    tag = new char[tagSize + 1];
+    memcpy(tag, other.tag, tagSize);
+    tag[tagSize] = '\0';
+  }
+
+  void moveTag(LifeCycleLogger&& other) {
+    tagSize = other.tagSize;
+    tag = other.tag;
+    other.tag = nullptr;
+    other.tagSize = 0;
+  }
 
   void log(const std::string& message){
     if (shouldLog) {
-      std::cout << message << ": " << m_id << std::endl;
+      std::cout << "  " << message << " " << id << " (" << (tag == nullptr ? "* moved *" : tag) << ")" << std::endl;
     }
+  }
+
+  void logConstruct(size_t idOther, bool isMove = false){
+    if (shouldLog) {
+      std::cout << "  Constructed " << id << " based on " << idOther << (isMove ? " (Move: " : " (Copy: ") << tag << ")" << std::endl;
+    }
+  }
+
+  void logAssign(size_t idOther, bool isMove = false){
+    if (shouldLog) {
+      std::cout << "  Assigned " << id << " = " << idOther << (isMove ? " (Move: " : " (Copy: ") << tag << ")" << std::endl;
+    }
+  }
+
+  static void printCount(int count, std::string type){
+    std::cout << "  " << count << " " << type << std::endl;
   }
 };
 
 std::ostream& operator<<(std::ostream& os, const LifeCycleLogger& lcl) {
-  os << lcl.m_id << ": " << lcl.heapTest;
+  os << lcl.id << ": " << lcl.tag;
   return os;
 }
 
