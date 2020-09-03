@@ -1,6 +1,14 @@
+# The following script allows files without extensions to be ignored
+# Ignore all
 *
+# Unignore all files with extensions
 !*.*
+# Unignore all folders
+!*/
 
+*.o
+*.s
+*.exe
 a.out
 *.dSYM
 .vscode
