@@ -9,6 +9,7 @@
 *.o
 *.s
 *.exe
+*.gch
 a.out
 *.dSYM
 .vscode
