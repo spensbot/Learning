@@ -10,7 +10,9 @@
 *.s
 *.exe
 *.gch
-a.out
 *.dSYM
+*.out
+
+.DS_Store
 .vscode
 words.txt
