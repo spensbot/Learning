@@ -9,7 +9,7 @@ public:
     Base() { // <-- constructor cannot be virtual. Before construction, there is no v-table.
         print("Base Constructor");
     }
-    virtual ~Base() {
+    ~Base() {
         print("Base Destructor");
     }
     virtual void test() {
@@ -20,10 +20,10 @@ public:
 class Derived : public Base {
 public:
     Derived()
-    : Base() { // <-- Base constructor must be explicitly called
+    : Base() { // <-- Base constructor can be explicitly called like this
         print("Derived Constructor");
     }
-    ~Derived() override {
+    ~Derived() {
         print("Derived Destructor");
     }
     void test() override {
