@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "material.h"
 #include "image.h"
+#include "timer.h"
 
 #include <mutex>
 #include <thread>
@@ -13,10 +14,10 @@
 #include <functional>
 
 //Image Quality
-const int image_width = 100;
-const int samples_per_pixel_total = 64;
+const int image_width = 1200;
+const int samples_per_pixel_total = 500;
 
-const int threadCount = 8;
+const int threadCount = 16;
 const int samples_per_pixel = samples_per_pixel_total / threadCount;
 
 const auto aspect_ratio = 16.0 / 9.0;
@@ -121,10 +122,18 @@ public:
     for (int i=0 ; i<threadCount ; i++) {
       singleton().linesLeft.push_back(0);
     }
+    singleton().timer.reset();
   }
 
   void update(int thread, int lineCount) {
     std::lock_guard<std::mutex> guard(threadProgressMutex);
+
+    if(thread == 0) {
+      auto elapsed = singleton().timer.getElapsedS();
+      estimatedTime = elapsed * lineCount;
+      singleton().timer.reset();
+    }
+
     linesLeft[thread] = lineCount;
     std::cerr << "\rScanlines remaining: ";
     
@@ -132,12 +141,16 @@ public:
       std::cerr << line << ' ';
     }
 
+    std::cerr << "Estimated: " << estimatedTime / 60.0 << " minutes";
+
     std::cerr << std::flush;
   }
 
 private:
   std::mutex threadProgressMutex;
   std::vector<int> linesLeft;
+  Timer timer;
+  double estimatedTime = 0.0; // seconds
 };
 
 void renderImage(const hittable_list& world, const unsigned int threadIndex, Image* image){
@@ -184,8 +197,8 @@ int main()
     }
   }
 
-  // Image::average(images).output();
-  images[0].output();
+  Image::average(images).output();
+  // images[0].output();
   // Image::average(images[0], images[1]).output();
 
   std::cerr << "\nDone.\n";
