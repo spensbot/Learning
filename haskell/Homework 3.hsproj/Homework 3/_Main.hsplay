@@ -1,0 +1,7 @@
+-- Haskell Playground 1.0
+skips "ABCD"
+-- == ["ABCD", "BD", "C", "D"]
+
+hasIndexMultiple 8 (2, "a")
+
+indexed "asdf"

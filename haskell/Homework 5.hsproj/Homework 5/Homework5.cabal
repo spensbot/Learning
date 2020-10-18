@@ -1,0 +1,17 @@
+cabal-version: 2.4
+name: Homework5
+version: 1.0
+stability: experimental
+x-ghc-framework-version: 8.6.4-13.14-2
+x-last-ide-version: HfM1.7.0
+
+executable Homework5
+    main-is: Main.hs
+    other-modules:
+        ExprT
+        StackVM
+        Parser
+    default-language: Haskell2010
+    build-depends:
+        base -any,
+        containers -any

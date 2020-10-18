@@ -1,0 +1,29 @@
+cabal-version: 2.4
+name: Homework3
+version: 1.0
+stability: experimental
+x-ghc-framework-version: 8.6.4-13.14-2
+x-last-ide-version: HfM1.7.0
+
+executable Executable
+    main-is: NewModule.hs
+    default-language: Haskell2010
+    build-depends:
+        base -any,
+        split -any
+
+executable Executable2
+    main-is: NewModule2.hs
+    other-modules:
+        StackVM
+        Parser
+        ExprT
+    default-language: Haskell2010
+    build-depends:
+        base -any
+
+executable Homework3
+    main-is: Main.hs
+    default-language: Haskell2010
+    build-depends:
+        base -any

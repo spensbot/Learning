@@ -1,0 +1,15 @@
+-- Haskell Playground 1.0
+validate 4012888888881881
+validate 4012888888881882
+
+
+
+moves3 = hanoi 15 "a" "b" "c"
+getSize(moves3)
+moves3
+
+
+
+moves4 = hanoi4 15 "a" "b" "c" "d"
+getSize(moves4)
+moves4

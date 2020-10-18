@@ -1,0 +1,105 @@
+-- Haskell Playground 1.0
+skips "ABDC"
+
+hasIndexMultiple 4 (0, "a")
+
+myIndexed "asdf"
+
+skipNum "asdfasdfasdf" 3
+
+skips "ABCD" == ["ABCD", "BD", "C", "D"]
+skips "hello!" == ["hello!", "el!", "l!", "l", "o", "!"]
+skips [1] == [[1]]
+skips [True,False] == [[True,False], [False]]
+skips [] == []
+
+
+
+
+
+
+
+subGroups3 "asdfasdf"
+
+isLocalMaxima (1,-100,2)
+
+localMaxima [2,9,5,6,1] == [9,6]
+localMaxima [2,3,4,1,5] == [4]
+localMaxima [1,2,3,4,5] == []
+
+
+
+
+res = getCounts [0,1,5,6,7,8,9,9,9,2,3,5,7,4,2,7,5,3,7]
+
+
+
+getRow res 1
+
+
+putStr (histogram [5,6,7,8,9,9,9,2,3,5,7,4,2,7,5,3,7,9,9,9,9,9,9])
+
+
+zip3
+
+
+
+xor [False, True, False] == True
+xor [False, True, False, False, True] == False
+
+
+map (+1) [1, 2, 3, 4, 5]
+map' (+1) [1, 2, 3, 4, 5, 6]
+
+cartProd [1..5] [2..5]
+
+map (+1) [1..5] 
+
+(\(i, j) -> i + j + 2*i*j) (1,2)
+
+map (\(i, j) -> i + j + 2*i*j) (cartProd [1..5] [1..5])
+
+
+sieve 50
+
+tree = foldTree "ABCDEFGHIJKLMNOP"
+
+tree
+
+isFull tree
+
+
+fun1 [3,4,5,6,7,8]
+fun1' [3,4,5,6,7,8]
+
+fun2 100
+fun2' 100
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

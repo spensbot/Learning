@@ -1,0 +1,73 @@
+-- Haskell Playground 1.0
+eval (Mul (Add (Lit 2) (Lit 3)) (Lit 4)) == 20
+
+
+parseExp Lit Add Mul "(2+3)*4"
+
+str = "(2+3)*4"
+
+parseExp Lit Add Mul str
+
+evalStr "(2+3)*4"
+evalStr "2+3*"
+
+Lit
+Add
+Mul
+
+(mul (add (lit 2) (lit 3)) (lit 4) :: ExprT) == Mul (Add (Lit 2) (Lit 3)) (Lit 4)
+
+mul (add (lit 2) (lit 3)) (lit 4) :: ExprT
+
+reify $ mul (add (lit 2) (lit 3)) (lit 4)
+
+mul (add (lit 2) (lit 3)) (lit 4) :: Integer
+
+
+MinMax
+
+max
+
+
+testInteger = testExp :: Maybe Integer
+testBool = testExp :: Maybe Bool
+testMM = testExp :: Maybe MinMax
+testSat = testExp :: Maybe Mod7
+
+testInteger
+testBool
+testMM
+testSat
+
+
+withVars [("x", 6)] $ add (lit 3) (var "x")
+withVars [("x", 6)] $ add (lit 3) (var "y")
+withVars [("x", 6), ("y", 3)] $ mul (var "x") (add (var "y") (var "x"))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+($)
+(.)
+
+
+
+
+
+
+

@@ -1,0 +1,27 @@
+{
+    "message": {
+        "id": "Unique Message ID",
+        "landscapeContent": "HTML String or HTTP Link",
+        "portraitContent": "...",
+        "trigger": "eogAnimationComplete",
+        "conditions": {
+            "appVersion": "min/max app version",
+            "minDisplayInterval": 30,
+            "maxDisplays": 2
+        }
+    }
+
+    ,
+
+    "persistedMessageData": {
+        "<messageID>": {
+            "displayCount": 1,
+            "lastDisplay": "Date stamp"
+        }
+    }
+}
+
+
+
+
+

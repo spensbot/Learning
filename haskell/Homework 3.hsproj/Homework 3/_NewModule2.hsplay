@@ -1,0 +1,9 @@
+-- Haskell Playground 1.0
+eval (Mul (Add (Lit 2) (Lit 3)) (Lit 4))
+
+myMaybe = parseExp Lit Add Mul "(2+3)*4"
+
+myMaybe
+
+evalStr "(2+3)*4"
+
