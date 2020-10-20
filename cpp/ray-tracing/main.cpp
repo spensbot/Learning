@@ -14,8 +14,8 @@
 #include <functional>
 
 //Image Quality
-const int image_width = 1200;
-const int samples_per_pixel_total = 500;
+const int image_width = 600;
+const int samples_per_pixel_total = 16;
 
 const int threadCount = 16;
 const int samples_per_pixel = samples_per_pixel_total / threadCount;

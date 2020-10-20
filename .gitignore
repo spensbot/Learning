@@ -12,6 +12,7 @@
 *.gch
 *.dSYM
 *.out
+*.ppm
 
 .DS_Store
 .vscode

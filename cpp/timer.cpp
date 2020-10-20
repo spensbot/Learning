@@ -53,7 +53,7 @@ public:
   }
 
 private:
-  std::chrono::time_point<std::chrono::high_resolution_clock> startPoint;
+  timePoint startPoint;
 };
 
 
