@@ -13,15 +13,15 @@ timer.lap("Imports")
 BATCH_SIZE = 64
 
 n_chars = len(data.chars2)
-
-attention_params = models.MultiHeadAttentionParams(n_heads=4, n_qkv=16, masked=True)
+device = util.pytorch_device('gpu')
+attention_params = models.MultiHeadAttentionParams(n_heads=4, n_qkv=64, masked=True)
 n_l = attention_params.n_l
-
 print(attention_params)
 
 transformer = models.Transformer(
     n_tokens=n_chars, n_layers=2, attention_params=attention_params
 )
+transformer.to(device)
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(transformer.parameters(), lr=0.001)
 
@@ -29,13 +29,10 @@ losses = []
 
 
 def getBatch(data):
-    batch_indexes = torch.randint(0, len(data) - BATCH_SIZE, (BATCH_SIZE,))
-    x = torch.stack([data[i : i + n_l] for i in batch_indexes])
-    y = torch.stack([data[i + 1 : i + n_l + 1] for i in batch_indexes])
-    return x, y
-
-
-# print(getBatch(trainSet))
+    batch_indexes = torch.randint(0, len(data) - n_l, (BATCH_SIZE,))
+    X = torch.stack([data[i : i + n_l] for i in batch_indexes])
+    Y = torch.stack([data[i + 1 : i + n_l + 1] for i in batch_indexes])
+    return X.to(device), Y.to(device)
 
 
 def train(model, data, batch_count: int) -> None:
@@ -76,7 +73,8 @@ def eval(model, data) -> None:
 
 
 def generate(model, len: int) -> str:
-    tokens = torch.zeros((1, n_l), dtype=torch.long)  # (B, L)
+    tokens = torch.zeros((1, n_l), dtype=torch.long).to(device)  # (B, L)
+    print(f"tokens.device: {tokens.device}")
 
     with torch.no_grad():
         for i in range(len):
@@ -95,11 +93,12 @@ print(generate(transformer, 1000))
 
 trainSet, testSet = data.load(0.8)
 timer.lap("Loading")
-train(transformer, trainSet, 10000)
+train(transformer, trainSet, 5000)
 timer.lap("Training")
 
 print("\n\nAFTER TRAINING\n\n")
 print(generate(transformer, 1000))
+timer.lap("Generate")
 
 plt.plot(losses)
 plt.show()

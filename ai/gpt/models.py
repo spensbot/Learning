@@ -21,6 +21,7 @@ class Embedding(nn.Module):
     def __init__(self, n_tokens: int, n_embed: int) -> None:
         super().__init__()
         self.table = nn.Parameter(torch.randn([n_tokens, n_embed]) * 0.1)
+        print(f"Embedding.table.device: {self.table.device}")
 
     # In: tensor filled with dict indices from [0, n_dict)
     # Out: tensor with an added end dimention of n_embed
@@ -38,11 +39,12 @@ class AttentionHead(nn.Module):
         self.q = nn.Linear(params.n_embed, params.n_qkv)
         self.k = nn.Linear(params.n_embed, params.n_qkv)
         self.v = nn.Linear(params.n_embed, params.n_qkv)
-        self.mask = (
+        mask = (
             torch.tril(torch.ones(params.n_l, params.n_l)).logical_not()
             if params.masked
             else None
         )
+        self.register_buffer("mask", mask)
 
     # In: tensor (B, L, E): (batch, sequence length, embedding size)
     # Out: tensor (B, L, n_qkv): (batch, sequence length, n_qkv)
@@ -116,7 +118,7 @@ class Transformer(nn.Module):
     def forward(self, x):
         token_embedding = self.token_embed(x)  # (B, L, E)
         position_embedding = self.position_embed(
-            torch.arange(0, self.attention_params.n_embed)
+            torch.arange(0, self.attention_params.n_embed).to(x.device)
         )  # (L, E)
 
         # TODO: Try without positional embedding to see how much of an impact it has.
