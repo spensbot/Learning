@@ -2,10 +2,10 @@ import os
 import torch
 
 
-def read_gutenberg_books(dir_path: str) -> list[str]:
+def read_gutenberg_books(dir_path: str) -> str:
     start_marker = "*** START OF THE PROJECT GUTENBERG EBOOK"
     end_marker = "*** END OF THE PROJECT GUTENBERG EBOOK"
-    book_texts: list[str] = []
+    book_texts: str = ""
 
     i = 0
 
@@ -23,7 +23,7 @@ def read_gutenberg_books(dir_path: str) -> list[str]:
                         content.find("\n", start_idx) + 1
                     )  # Move to the end of the line containing the start marker
                     book_text = content[start_idx:end_idx].strip()
-                    book_texts.append(book_text)
+                    book_texts += book_text
 
     return book_texts
 
@@ -52,8 +52,8 @@ def decode(encoded_text: list[int]) -> str:
 
 
 def load(split: float) -> tuple[torch.Tensor, torch.Tensor]:
-    all_text: str = read_shakespeare("./shakespeare")
-    n_chars = len(chars2)
+    # all_text: str = read_shakespeare("./shakespeare")
+    all_text: str = read_gutenberg_books("./gutenberg")
     n = len(all_text)
     split_idx = int(n * split)
     train_text = all_text[:split_idx]
