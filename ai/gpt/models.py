@@ -169,14 +169,15 @@ def AddAndNorm(
     if config.residual:
         x += x_res
     if config.layer_norm:
-        x = LayerNorm(x, layerDim=-2)
+        x = LayerNorm(x, layerDim=1)
     return x
 
 
-def LayerNorm(x: torch.Tensor, layerDim: int) -> torch.Tensor:
+# TODO: Turn LayerNorm into a Module with learnable beta and gamma params
+def LayerNorm(x: torch.Tensor, layerDim: int, eps: float = 1e-5) -> torch.Tensor:
     mean = x.mean(dim=layerDim, keepdim=True)
-    std = x.std(dim=layerDim, keepdim=True)
-    return (x - mean) / std
+    var = x.var(dim=layerDim, keepdim=True)
+    return (x - mean) / torch.sqrt(var + eps)
 
 
 # These shouldn't be required until the layer count is increased to a high number. >3ish in my experience
