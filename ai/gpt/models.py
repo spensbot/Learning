@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class MultiHeadAttentionParams:
+class MultiHeadAttentionConfig:
     def __init__(self, n_heads: int, n_qkv: int, masked=False):
         self.n_heads = n_heads
         self.n_qkv = n_qkv
@@ -14,7 +14,31 @@ class MultiHeadAttentionParams:
         self.masked = masked
 
     def __str__(self):
-        return f"MultiHeadAttentionParams(n_heads={self.n_heads}, n_qkv={self.n_qkv}, n_embed={self.n_embed}, n_l={self.n_l}, masked={self.masked})"
+        return f"MultiHeadAttentionConfig(n_heads={self.n_heads}, n_qkv={self.n_qkv}, n_embed={self.n_embed}, n_l={self.n_l}, masked={self.masked})"
+
+
+class TransformerConfig:
+    def __init__(
+        self,
+        n_tokens: int,
+        n_layers: int,
+        attention: MultiHeadAttentionConfig,
+        layer_norm: bool = True,
+        dropout: float = 0.1,
+        residual: bool = True,
+    ):
+        self.n_tokens = n_tokens
+        self.n_layers = n_layers
+        self.attention = attention
+        self.layer_norm = layer_norm
+        self.dropout = dropout
+        self.residual = residual
+
+    def __str__(self):
+        return f"""
+TransformerConfig(n_tokens={self.n_tokens}, n_layers={self.n_layers}, layer_norm={self.layer_norm}, dropout={self.dropout}, residual={self.residual}
+{self.attention}
+)"""
 
 
 class Embedding(nn.Module):
@@ -32,7 +56,7 @@ class Embedding(nn.Module):
 class AttentionHead(nn.Module):
     def __init__(
         self,
-        params: MultiHeadAttentionParams,
+        params: MultiHeadAttentionConfig,
     ) -> None:
         super().__init__()
         self.params = params
@@ -63,7 +87,7 @@ class AttentionHead(nn.Module):
 
 
 class MultiHeadAttention(nn.Module):
-    def __init__(self, params: MultiHeadAttentionParams) -> None:
+    def __init__(self, params: MultiHeadAttentionConfig) -> None:
         super().__init__()
         self.params = params
         self.heads = nn.ModuleList(
@@ -74,51 +98,54 @@ class MultiHeadAttention(nn.Module):
     # In: tensor (B, L, E) (batch, sequence length, embedding size)
     # Out: tensor (B, L, E)
     def forward(self, x):
-        # TODO: Remove this cat for efficiency
+        # TODO: Remove this cat for efficiency? Can you?
         x = torch.cat([head(x) for head in self.heads], dim=-1)
         x = self.linear(x)
         return x
 
 
 class AttentionLayer(nn.Module):
-    def __init__(self, params: MultiHeadAttentionParams) -> None:
+    def __init__(self, config: TransformerConfig) -> None:
         super().__init__()
-        self.attention = MultiHeadAttention(params)
-        n_embed = params.n_embed
+        self.config = config
+        self.multiHeadAttention = MultiHeadAttention(config.attention)
+        n_embed = config.attention.n_embed
         self.linear1 = nn.Linear(n_embed, n_embed * 4)
         self.linear2 = nn.Linear(n_embed * 4, n_embed)
 
     # In: tensor (B, L, E) (batch, sequence length, embedding size)
     # Out: tensor (B, L, E)
     def forward(self, x):
-        x = self.attention(x)
+        x_res = x
+        x = self.multiHeadAttention(x)
+        x = AddAndNorm(x, x_res, self.config)
+        x_res2 = x
         x = self.linear1(x)
         x = F.relu(x)
         x = self.linear2(x)
-        return x
+        return AddAndNorm(x, x_res2, self.config)
 
 
 class Transformer(nn.Module):
-    def __init__(
-        self, n_tokens: int, n_layers: int, attention_params: MultiHeadAttentionParams
-    ):
+    def __init__(self, config: TransformerConfig):
         super().__init__()
-        self.attention_params = attention_params
-        self.token_embed = nn.Embedding(n_tokens, attention_params.n_embed)
+        self.config = config
+        self.attention_config = config.attention
+        self.token_embed = nn.Embedding(config.n_tokens, config.attention.n_embed)
         self.position_embed = nn.Embedding(
-            attention_params.n_l, attention_params.n_embed
+            config.attention.n_l, config.attention.n_embed
         )
         self.attention_layers = nn.ModuleList(
-            [AttentionLayer(attention_params) for _ in range(n_layers)]
+            [AttentionLayer(config) for _ in range(config.n_layers)]
         )
-        self.linear = nn.Linear(attention_params.n_embed, n_tokens)
+        self.linear = nn.Linear(config.attention.n_embed, config.n_tokens)
 
     # In: tensor (B, L) of token indices
     # Out: tensor (B, L, T) of token probabilities
     def forward(self, x):
         token_embedding = self.token_embed(x)  # (B, L, E)
         position_embedding = self.position_embed(
-            torch.arange(0, self.attention_params.n_embed).to(x.device)
+            torch.arange(0, self.config.attention.n_embed).to(x.device)
         )  # (L, E)
 
         # TODO: Try without positional embedding to see how much of an impact it has.
@@ -136,7 +163,23 @@ class Transformer(nn.Module):
         return x
 
 
-# These shouldn't be required until the layer count is increased to a high number.
-# TODO: Dropout
-# TODO: LayerNorm
+def AddAndNorm(
+    x: torch.Tensor, x_res: torch.Tensor, config: TransformerConfig
+) -> torch.Tensor:
+    if config.residual:
+        x += x_res
+    if config.layer_norm:
+        x = LayerNorm(x, layerDim=-2)
+    return x
+
+
+def LayerNorm(x: torch.Tensor, layerDim: int) -> torch.Tensor:
+    mean = x.mean(dim=layerDim, keepdim=True)
+    std = x.std(dim=layerDim, keepdim=True)
+    return (x - mean) / std
+
+
+# These shouldn't be required until the layer count is increased to a high number. >3ish in my experience
 # TODO: Residual connections
+# TODO: LayerNorm
+# TODO: Dropout
