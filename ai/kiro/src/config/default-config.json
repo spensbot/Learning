@@ -1,0 +1,38 @@
+{
+  "ship": {
+    "thrustSpeed": 200,
+    "rotationSpeed": 180,
+    "maxSpeed": 400,
+    "friction": 0.98,
+    "invincibilityTime": 2000
+  },
+  "projectile": {
+    "speed": 500,
+    "maxCount": 4,
+    "lifetime": 2000
+  },
+  "asteroid": {
+    "speeds": {
+      "large": 50,
+      "medium": 75,
+      "small": 100
+    },
+    "splitCount": {
+      "min": 2,
+      "max": 3
+    }
+  },
+  "game": {
+    "initialLives": 3,
+    "initialAsteroidCount": 4,
+    "waveIncrement": 2,
+    "safeSpawnRadius": 100
+  },
+  "scoring": {
+    "asteroidPoints": {
+      "large": 20,
+      "medium": 50,
+      "small": 100
+    }
+  }
+}
